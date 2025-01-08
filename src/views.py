@@ -1,12 +1,13 @@
 import json
 import os
+
 from dotenv import load_dotenv
+
 from src.utils import (filter_transactions_by_date, get_cards_data, get_data_from_xlsx, get_exchange_rates,
                        get_stocks_cost, get_top_5_transactions, greeting)
 
-with open('../user_settings.json', 'r') as file:
+with open('./user_settings.json', 'r') as file:
     user_choice = json.load(file)
-
 load_dotenv()
 api_key_currency = os.getenv("API_KEY_CURRENCY")
 api_key_stocks = os.getenv("API_KEY_STOCKS")

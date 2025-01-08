@@ -1,9 +1,9 @@
 import json
 import logging
+import re
 from datetime import datetime
 from typing import Dict, List
 
-# Настройка логирования
 logger = logging.getLogger("services")
 logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler(r'../logs/services.log', mode='w')
@@ -32,12 +32,15 @@ def analyze_cashback(transactions: List[Dict], year: int, month: int) -> str:
                         cashback_analysis[category] += cashback
                     else:
                         cashback_analysis[category] = cashback
+        logger.info('Посчитана сумма кэшбека по категориям')
         return json.dumps(cashback_analysis, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.error(f'Ошибка при подсчете кэшбека: {e}')
+        print(f'Возникла ошибка {e}')
+        logger.error(f'Возникла ошибка {e}')
         return ''
 
 
+# принимает строку с датой гггг.мм
 def investment_bank(transactions: List[Dict], date: str, limit: int) -> float | Exception:
     """Функция принимает транзакции, дату и лимит округления и считает сколько можно было отложить в инвесткопилку"""
     try:
@@ -51,14 +54,16 @@ def investment_bank(transactions: List[Dict], date: str, limit: int) -> float | 
                     amount_ = abs(amount)  # перевел в положительное
                     total_amount = ((amount_ + limit + 1) // limit) * limit - amount_
                     sum_investment_bank += total_amount
+        logger.info(f"Инвесткопилка за  {date} посчитана")
         return sum_investment_bank
     except Exception as e:
-        logger.error(f'Ошибка при расчете инвесткопилки: {e}')
+        print(f'Возникла ошибка {e}')
+        logger.error(f'Возникла ошибка {e}')
         return e
 
 
 def search_transactions_by_user_choice(transactions: List[Dict], search: str) -> str:
-    """Функция выполняет поиск в транзакциях по переданной строке"""
+    """Функция выполняет поиск в транзакциях по переданной строке """
     try:
         search_result = []
         for transaction in transactions:
@@ -66,9 +71,11 @@ def search_transactions_by_user_choice(transactions: List[Dict], search: str) ->
             description = str(transaction.get('Описание', ''))
             if search.lower() in description.lower() or search.lower() in category.lower():
                 search_result.append(transaction)
+        logger.info(f'Выполнен поиск по запросу {search}')
         return json.dumps(search_result, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.error(f'Ошибка при поиске транзакций: {e}')
+        print(f'Возникла ошибка {e}')
+        logger.error(f'Возникла ошибка {e}')
         return ''
 
 
@@ -81,9 +88,11 @@ def search_transaction_by_mobile_phone(transactions: List[Dict]) -> str:
             description = transaction.get('Описание', '')
             if mobile_pattern.search(description):
                 found_transactions.append(transaction)
+        logger.info('Выполнен поиск по транзакциям с номером телефона')
         return json.dumps(found_transactions, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.error(f'Ошибка при поиске транзакций по номеру телефона: {e}')
+        print(f'Возникла ошибка {e}')
+        logger.error(f'Возникла ошибка {e}')
         return ''
 
 
@@ -97,7 +106,9 @@ def find_person_to_person_transactions(transactions: List[Dict]) -> str:
             description = transaction.get('Описание', '')
             if category == 'Переводы' and search_pattern.search(description):
                 transfer_transactions.append(transaction)
+        logger.info('Выполнен поиск по переводам физлицам')
         return json.dumps(transfer_transactions, ensure_ascii=False, indent=4)
     except Exception as e:
-        logger.error(f'Ошибка при поиске переводов физическим лицам: {e}')
+        print(f'Возникла ошибка {e}')
+        logger.error(f'Возникла ошибка {e}')
         return ''

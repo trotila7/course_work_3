@@ -1,30 +1,116 @@
+import json
 import pytest
-from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
 import pandas as pd
+from datetime import datetime
+from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
 
 
-@pytest.fixture
-def sample_transactions():
-    return [
-        {"Дата операции": "01.03.2020 10:00:00", "Сумма операции": -100, "Категория": "Супермаркеты"},
-        {"Дата операции": "15.03.2020 15:30:00", "Сумма операции": -50, "Категория": "Кафе"},
-        {"Дата операции": "25.03.2020 18:00:00", "Сумма операции": -20, "Категория": "Транспорт"}
-    ]
+def test_spending_by_category():
+    transactions_data = {
+        'Дата операции': ['01.06.2024 12:00:00', '02.06.2024 12:00:00', '15.05.2024 08:30:00', '10.05.2024 15:45:00'],
+        'Категория': ['Еда', 'Транспорт', 'Еда', 'Транспорт'],
+        'Сумма': [100, 50, 80, 70]
+    }
+    transactions_df = pd.DataFrame(transactions_data)
+
+    expected_result = ('[\n'
+                       '    {\n'
+                       '        "Дата операции": "01.06.2024 12:00:00",\n'
+                       '        "Категория": "Еда",\n'
+                       '        "Сумма": 100\n'
+                       '    },\n'
+                       '    {\n'
+                       '        "Дата операции": "15.05.2024 08:30:00",\n'
+                       '        "Категория": "Еда",\n'
+                       '        "Сумма": 80\n'
+                       '    }\n'
+                       ']')
+
+    expected_result_1 = ('[\n'
+                         '    {\n'
+                         '        "Дата операции": "02.06.2024 12:00:00",\n'
+                         '        "Категория": "Транспорт",\n'
+                         '        "Сумма": 50\n'
+                         '    },\n'
+                         '    {\n'
+                         '        "Дата операции": "10.05.2024 15:45:00",\n'
+                         '        "Категория": "Транспорт",\n'
+                         '        "Сумма": 70\n'
+                         '    }\n'
+                         ']')
+
+    # Тест с передачей даты
+    result = spending_by_category(transactions_df, 'Еда', '2024.06.30')
+    print(f"Result with date: {result}")  # Добавим вывод для диагностики
+    assert result.strip() == expected_result.strip()
+
+    # Тест без передачи даты
+    result = spending_by_category(transactions_df, 'Транспорт')
+    print(f"Result without date: {result}")  # Добавим вывод для диагностики
+    assert result.strip() == expected_result_1.strip()
+
+    # Тест с некорректной категорией
+    result = spending_by_category(transactions_df, 'Несуществующая категория')
+    assert result == '[]'
 
 
-def test_spending_by_category(sample_transactions):
-    df = pd.DataFrame(sample_transactions)
-    result = spending_by_category(df, "Супермаркеты", "2020.03.20")
-    assert '"Категория": "Супермаркеты"' in result
+def test_spending_by_weekday():
+    data = {
+        'Дата операции': ['01.06.2024 12:00:00', '02.06.2024 12:00:00', '15.05.2024 08:30:00', '10.05.2024 15:45:00',
+                          '25.04.2024 18:20:00',
+                          '15.04.2024 09:10:00', '16.04.2024 09:10:00'],
+        'Сумма операции': [1000, 500, 300, 700, 400, 100, 500]
+    }
+    transactions = pd.DataFrame(data)
+    transactions['Дата операции'] = pd.to_datetime(transactions['Дата операции'], format='%d.%m.%Y %H:%M:%S')
+
+    result_current_date = spending_by_weekday(transactions)
+    print(f"Result for current date (weekday): {result_current_date}")  # Добавим вывод для диагностики
+    expected_result_current_date = {
+        "Понедельник": 100.0,
+        "Вторник": 500.0,
+        "Среда": 300.0,
+        "Четверг": 400.0,
+        "Пятница": 700.0,
+        "Суббота": 1000.0,
+        "Воскресенье": 500.0
+    }
+    assert json.loads(result_current_date) == expected_result_current_date
+
+    result_given_date = spending_by_weekday(transactions, '2024.06.15')
+    print(f"Result for given date (weekday): {result_given_date}")  # Добавим вывод для диагностики
+    expected_result_given_date = {
+        "Понедельник": 100.0,
+        "Вторник": 500.0,
+        "Среда": 300.0,
+        "Четверг": 400.0,
+        "Пятница": 700.0,
+        "Суббота": 1000.0,
+        "Воскресенье": 500.0
+    }
+    assert json.loads(result_given_date) == expected_result_given_date
 
 
-def test_spending_by_weekday(sample_transactions):
-    df = pd.DataFrame(sample_transactions)
-    result = spending_by_weekday(df, "2020.03.20")
-    assert '"Понедельник":' in result
+def test_spending_by_workday():
+    data = {
+        'Дата операции': ['01.06.2024 12:00:00', '02.06.2024 12:00:00', '15.05.2024 08:30:00', '10.05.2024 15:45:00',
+                          '25.04.2024 18:20:00', '15.04.2024 09:10:00', '16.04.2024 09:10:00'],
+        'Сумма операции': [1000, 500, 300, 700, 400, 100, 500]
+    }
+    transactions = pd.DataFrame(data)
 
+    result_current_date = spending_by_workday(transactions)
+    print(f"Result for current date (workday): {result_current_date}")  # Добавим вывод для диагностики
+    expected_result_current_date = {
+        "Рабочий": 400.0,  # Средняя сумма операций по рабочим дням
+        "Выходной": 750.0  # Средняя сумма операций по выходным дням
+    }
+    assert json.loads(result_current_date) == expected_result_current_date
 
-def test_spending_by_workday(sample_transactions):
-    df = pd.DataFrame(sample_transactions)
-    result = spending_by_workday(df, "2020.03.20")
-    assert '"Рабочий":' in result
+    result_given_date = spending_by_workday(transactions, '2024.06.15')  # без даты
+    print(f"Result for given date (workday): {result_given_date}")  # Добавим вывод для диагностики
+    expected_result_given_date = {
+        "Рабочий": 400.0,  # Средняя сумма операций по рабочим дням
+        "Выходной": 750.0  # Средняя сумма операций по выходным дням
+    }
+    assert json.loads(result_given_date) == expected_result_given_date
