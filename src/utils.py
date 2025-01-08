@@ -1,6 +1,11 @@
 import pandas as pd
 
 
-def read_transactions(file_path):
-    """ Чтение данных из Excel-файла. """
-    return pd.read_excel(file_path)
+def get_data_from_xlsx(path: str) -> list:
+    """Чтение транзакций из файла Excel"""
+    try:
+        df = pd.read_excel(path)
+        return df.to_dict(orient='records')
+    except Exception as e:
+        print(f'Ошибка: {e}')
+        return []
