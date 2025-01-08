@@ -1,13 +1,21 @@
-def analyze_cashback(transactions: list, year: int, month: int) -> dict:
-    """Подсчет кэшбека по категориям"""
-    cashback_analysis = {}
-    for transaction in transactions:
-        transaction_date = datetime.strptime(transaction["Дата операции"], '%d.%m.%Y %H:%M:%S')
-        if transaction_date.year == year and transaction_date.month == month:
-            category = transaction["Категория"]
-            amount = transaction["Сумма операции"]
-            cashback_value = transaction.get("Кэшбэк")
-            cashback = cashback_value if cashback_value else amount * -0.01
-            cashback_analysis[category] = cashback_analysis.get(category, 0) + cashback
-    return cashback_analysis
+import json
+import logging
+from datetime import datetime
+from typing import List, Dict
 
+logger = logging.getLogger("services")
+
+
+def analyze_cashback(transactions: List[Dict], year: int, month: int) -> str:
+    # Логика для анализа кэшбэка
+    pass
+
+
+def investment_bank(transactions: List[Dict], date: str, limit: int) -> float:
+    # Логика для инвесткопилки
+    pass
+
+
+def search_transactions_by_user_choice(transactions: List[Dict], search: str) -> str:
+    # Логика для поиска по транзакциям
+    pass
