@@ -1,16 +1,20 @@
 import os
 from dotenv import load_dotenv
+from src.utils import get_data_from_xlsx
 
-# Загружаем переменные окружения
+# Загружаем переменные из .env файла
 load_dotenv()
 
-# Переменные для работы с API
+# Настройки API
 api_key_currency = os.getenv("API_KEY_CURRENCY")
 api_key_stocks = os.getenv("API_KEY_STOCKS")
 
-# Другие параметры
+# Параметры фильтрации транзакций
 input_date_str = "20.03.2020"
-transactions_path = '../data/operations.xls'
+transactions_path = r'../data/operations.xls'
+transactions = get_data_from_xlsx(transactions_path)
+
+# Настройки для расчета
 year = 2020
 month = 5
 date = "2020.05"
