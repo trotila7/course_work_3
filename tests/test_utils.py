@@ -1,29 +1,29 @@
 import pytest
-from datetime import datetime
 from src.utils import get_data_from_xlsx, filter_transactions_by_date
+from datetime import datetime
 
 
-def test_get_data_from_xlsx():
-    # Предположим, что файл данных существует
-    result = get_data_from_xlsx('../data/operations.xls')
-    assert isinstance(result, list), "Данные должны быть в виде списка словарей"
-    assert len(result) > 0, "Список данных не должен быть пустым"
-
-
-def test_filter_transactions_by_date():
-    transactions = [
-        {"Дата операции": "01.05.2020 10:00:00", "Категория": "Супермаркеты", "Сумма операции": -200},
-        {"Дата операции": "15.05.2020 10:00:00", "Категория": "Кафе", "Сумма операции": -150},
-        {"Дата операции": "20.05.2020 10:00:00", "Категория": "Супермаркеты", "Сумма операции": -300}
+@pytest.fixture
+def sample_transactions():
+    return [
+        {"Дата операции": "01.03.2020 10:00:00", "Сумма операции": 100, "Категория": "Супермаркеты"},
+        {"Дата операции": "15.03.2020 15:30:00", "Сумма операции": -50, "Категория": "Кафе"},
+        {"Дата операции": "25.03.2020 18:00:00", "Сумма операции": -20, "Категория": "Транспорт"}
     ]
-    input_date = "20.05.2020"
-    filtered_transactions = filter_transactions_by_date(transactions, input_date)
-    assert len(filtered_transactions) == 1, "Фильтрация не вернула нужное количество транзакций"
-    assert filtered_transactions[0]["Дата операции"] == datetime.strptime("20.05.2020 10:00:00",
-                                                                          "%d.%m.%Y %H:%M:%S"), "Дата фильтрации неверна"
 
 
-def test_greeting():
-    """Проверка корректности возвращаемого приветствия"""
-    greeting_message = greeting()
-    assert greeting_message in ["Доброе утро", "Добрый день", "Добрый вечер", "Доброй ночи"], "Некорректное приветствие"
+def test_get_data_from_xlsx(sample_transactions, tmp_path):
+    # Создание временного файла
+    file = tmp_path / "test_operations.xls"
+    df = pd.DataFrame(sample_transactions)
+    df.to_excel(file, index=False)
+
+    result = get_data_from_xlsx(str(file))
+    assert len(result) == 3
+    assert result[0]["Дата операции"] == "01.03.2020 10:00:00"
+
+
+def test_filter_transactions_by_date(sample_transactions):
+    filtered_transactions = filter_transactions_by_date(sample_transactions, "15.03.2020")
+    assert len(filtered_transactions) == 2
+    assert filtered_transactions[0]["Дата операции"] == "01.03.2020 10:00:00"

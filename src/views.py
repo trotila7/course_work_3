@@ -4,13 +4,13 @@ from dotenv import load_dotenv
 from src.utils import (filter_transactions_by_date, get_cards_data, get_data_from_xlsx, get_exchange_rates,
                        get_stocks_cost, get_top_5_transactions, greeting)
 
+with open('../user_settings.json', 'r') as file:
+    user_choice = json.load(file)
+
 load_dotenv()
 api_key_currency = os.getenv("API_KEY_CURRENCY")
 api_key_stocks = os.getenv("API_KEY_STOCKS")
 input_date_str = "20.03.2020"
-
-with open('../user_settings.json', 'r') as file:
-    user_choice = json.load(file)
 
 
 def main(input_date, user_settings, api_key_currency, api_key_stocks):

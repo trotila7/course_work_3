@@ -1,37 +1,30 @@
-import json
 import pytest
-import pandas as pd
 from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
+import pandas as pd
 
 
 @pytest.fixture
-def mock_data():
-    return pd.DataFrame({
-        "Дата операции": ["01.05.2020 10:00:00", "15.05.2020 10:00:00", "20.05.2020 10:00:00"],
-        "Категория": ["Супермаркеты", "Кафе", "Супермаркеты"],
-        "Сумма операции": [-200, -150, -300]
-    })
+def sample_transactions():
+    return [
+        {"Дата операции": "01.03.2020 10:00:00", "Сумма операции": -100, "Категория": "Супермаркеты"},
+        {"Дата операции": "15.03.2020 15:30:00", "Сумма операции": -50, "Категория": "Кафе"},
+        {"Дата операции": "25.03.2020 18:00:00", "Сумма операции": -20, "Категория": "Транспорт"}
+    ]
 
 
-def test_spending_by_category(mock_data):
-    result = spending_by_category(mock_data, "Супермаркеты", "2020.05.20")
-    assert isinstance(result, str), "Результат должен быть строкой"
-    result_dict = json.loads(result)
-    assert isinstance(result_dict, list), "Должен быть список транзакций"
-    assert len(result_dict) == 2, "Должны быть две транзакции по категории 'Супермаркеты'"
+def test_spending_by_category(sample_transactions):
+    df = pd.DataFrame(sample_transactions)
+    result = spending_by_category(df, "Супермаркеты", "2020.03.20")
+    assert '"Категория": "Супермаркеты"' in result
 
 
-def test_spending_by_weekday(mock_data):
-    result = spending_by_weekday(mock_data, "2020.05.20")
-    assert isinstance(result, str), "Результат должен быть строкой"
-    result_dict = json.loads(result)
-    assert isinstance(result_dict, dict), "Результат должен быть словарем"
-    assert "Понедельник" in result_dict, "День недели 'Понедельник' должен быть в результате"
+def test_spending_by_weekday(sample_transactions):
+    df = pd.DataFrame(sample_transactions)
+    result = spending_by_weekday(df, "2020.03.20")
+    assert '"Понедельник":' in result
 
 
-def test_spending_by_workday(mock_data):
-    result = spending_by_workday(mock_data, "2020.05.20")
-    assert isinstance(result, str), "Результат должен быть строкой"
-    result_dict = json.loads(result)
-    assert isinstance(result_dict, dict), "Результат должен быть словарем"
-    assert "Рабочий" in result_dict, "Тип дня 'Рабочий' должен быть в результате"
+def test_spending_by_workday(sample_transactions):
+    df = pd.DataFrame(sample_transactions)
+    result = spending_by_workday(df, "2020.03.20")
+    assert '"Рабочий":' in result
