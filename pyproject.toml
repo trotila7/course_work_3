@@ -13,10 +13,24 @@ pytest = "^8.3.4"
 flake8 = "^7.1.1"
 black = "^24.10.0"
 isort = "^5.13.2"
+flask = "^3.1.0"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
+pytest = "^8.3.4"
+
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+
+[tool.isort]
+profile = "black"
+line_length = 119
+known_third_party = ["requests", "pandas"]
+
