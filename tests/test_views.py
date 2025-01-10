@@ -1,8 +1,7 @@
 import pytest
-from src.views import main
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 import json
-import os
+from src.views import main
 
 
 # Мокируем настройки пользователя
@@ -12,10 +11,15 @@ def mock_user_settings():
         "user_currencies": ["USD", "EUR"],
         "user_stocks": ["AAPL", "GOOGL"]
     }
-    with open('./user_settings.json', 'r') as f:
-        json.dump(mock_settings, f)
-    yield 'user_settings.json'
-    os.remove('user_settings.json')
+
+    # Используем mock_open для имитации работы с файлом
+    mock_file = mock_open(read_data=json.dumps(mock_settings))
+
+    with patch("builtins.open", mock_file):
+        yield 'user_settings.json'
+
+    # Здесь не нужно удалять файл, так как используем mock_open
+    # mock_file() автоматически удалит "файл" после завершения теста
 
 
 def test_main(mock_user_settings):
