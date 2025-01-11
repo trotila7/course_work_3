@@ -21,6 +21,7 @@ pytest = "^8.3.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
+mypy = "^1.14.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -33,4 +34,9 @@ line-length = 119
 profile = "black"
 line_length = 119
 known_third_party = ["requests", "pandas"]
+
+[tool.mypy]
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = "venv"
 
