@@ -1,5 +1,7 @@
 import os
+
 from dotenv import load_dotenv
+
 from src.utils import get_data_from_xlsx
 
 # Загрузка переменных окружения

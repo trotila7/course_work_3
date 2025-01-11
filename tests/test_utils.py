@@ -1,6 +1,8 @@
-import pytest
-from src.utils import get_data_from_xlsx, filter_transactions_by_date
 from datetime import datetime
+
+import pytest
+
+from src.utils import filter_transactions_by_date, get_data_from_xlsx
 
 
 @pytest.fixture

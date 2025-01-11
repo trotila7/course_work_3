@@ -1,8 +1,14 @@
 import pandas as pd
-from src.config import input_date_str, api_key_currency, api_key_stocks, transactions
+
+from src.config import api_key_currency, api_key_stocks, input_date_str, transactions
 from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
-from src.services import analyze_cashback, investment_bank, search_transactions_by_user_choice, \
-    search_transaction_by_mobile_phone, find_person_to_person_transactions
+from src.services import (
+    analyze_cashback,
+    find_person_to_person_transactions,
+    investment_bank,
+    search_transaction_by_mobile_phone,
+    search_transactions_by_user_choice,
+)
 from src.views import main, user_choice
 
 # Генерация основной страницы

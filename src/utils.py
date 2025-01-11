@@ -1,7 +1,7 @@
-import os
 import logging
+import os
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import Dict, List
 
 import pandas as pd
 import requests
